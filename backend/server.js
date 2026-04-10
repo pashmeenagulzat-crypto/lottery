@@ -18,18 +18,38 @@ const adminRoutes = require('./routes/admin');
 const app = express();
 const server = http.createServer(app);
 
+// Allowed development origins for local development only
+const DEV_ORIGINS = [
+  'http://localhost:5173',
+  'http://localhost:4173',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:4173',
+];
+
 const getAllowedOrigins = () => {
   const raw = process.env.CORS_ORIGIN;
+  const isProduction = process.env.NODE_ENV === 'production';
+
   if (!raw) {
-    if (process.env.NODE_ENV === 'production') {
+    if (isProduction) {
       console.warn('⚠️  CORS_ORIGIN is not set in production. Cross-origin requests will be blocked. Set CORS_ORIGIN to your frontend URL(s).');
+      return false; // Block all cross-origin requests
+    }
+    // Development: only allow known local dev servers
+    return DEV_ORIGINS;
+  }
+
+  // Never allow wildcard '*' in production
+  if (raw === '*') {
+    if (isProduction) {
+      console.error('❌  CORS_ORIGIN=* is not allowed in production. Set it to your frontend URL(s).');
       return false;
     }
-    // Development default: allow all origins
-    return '*';
+    // Wildcard only accepted in explicit development mode
+    return DEV_ORIGINS;
   }
-  if (raw === '*') return '*';
-  // Support comma-separated list of origins
+
+  // Support comma-separated list of explicit origins
   const origins = raw.split(',').map((o) => o.trim()).filter(Boolean);
   return origins.length === 1 ? origins[0] : origins;
 };
