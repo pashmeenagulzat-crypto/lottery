@@ -20,7 +20,14 @@ const server = http.createServer(app);
 
 const getAllowedOrigins = () => {
   const raw = process.env.CORS_ORIGIN;
-  if (!raw) return process.env.NODE_ENV === 'production' ? false : '*';
+  if (!raw) {
+    if (process.env.NODE_ENV === 'production') {
+      console.warn('⚠️  CORS_ORIGIN is not set in production. Cross-origin requests will be blocked. Set CORS_ORIGIN to your frontend URL(s).');
+      return false;
+    }
+    // Development default: allow all origins
+    return '*';
+  }
   if (raw === '*') return '*';
   // Support comma-separated list of origins
   const origins = raw.split(',').map((o) => o.trim()).filter(Boolean);

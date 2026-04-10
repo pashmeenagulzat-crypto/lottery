@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const { pool } = require('../config/database');
 const { generateOTP } = require('../utils/otpGenerator');
 
@@ -56,7 +57,7 @@ const verifyOTP = async (req, res) => {
     let user;
 
     if (userRows.length === 0) {
-      const referralCode = 'REF' + Math.random().toString(36).substring(2, 8).toUpperCase();
+      const referralCode = 'REF' + crypto.randomBytes(3).toString('hex').toUpperCase();
       const [result] = await pool.query(
         'INSERT INTO users (mobile, referral_code) VALUES (?, ?)',
         [mobile, referralCode]
