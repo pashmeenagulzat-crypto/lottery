@@ -10,7 +10,7 @@ import { TransactionSkeleton } from '../components/LoadingSkeleton';
 
 type TxFilter = 'all' | 'deposit' | 'purchase' | 'winning';
 
-const UPI_ID = 'luckydraw@upi';
+const UPI_ID = import.meta.env.VITE_UPI_ID || 'luckydraw@upi';
 
 const WalletPage: React.FC = () => {
   const { user, updateWallet } = useAuth();
