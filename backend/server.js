@@ -18,9 +18,20 @@ const adminRoutes = require('./routes/admin');
 const app = express();
 const server = http.createServer(app);
 
+const getAllowedOrigins = () => {
+  const raw = process.env.CORS_ORIGIN;
+  if (!raw) return process.env.NODE_ENV === 'production' ? false : '*';
+  if (raw === '*') return '*';
+  // Support comma-separated list of origins
+  const origins = raw.split(',').map((o) => o.trim()).filter(Boolean);
+  return origins.length === 1 ? origins[0] : origins;
+};
+
+const allowedOrigins = getAllowedOrigins();
+
 const io = new Server(server, {
   cors: {
-    origin: process.env.CORS_ORIGIN || '*',
+    origin: allowedOrigins,
     methods: ['GET', 'POST'],
   },
 });
@@ -28,7 +39,7 @@ const io = new Server(server, {
 app.set('io', io);
 
 // Middlewares
-app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
+app.use(cors({ origin: allowedOrigins }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use('/api/', apiLimiter);
