@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const http = require('http');
+const path = require('path');
+const fs = require('fs');
 const { Server } = require('socket.io');
 const cors = require('cors');
 
@@ -84,10 +86,22 @@ app.use('/api/wallet', walletRoutes);
 app.use('/api/draw', drawRoutes);
 app.use('/api/admin', adminRoutes);
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ success: false, message: `Route ${req.method} ${req.path} not found` });
-});
+// Serve React frontend in production
+const FRONTEND_DIST = path.resolve(
+  process.env.FRONTEND_DIST || path.join(__dirname, '..', 'frontend', 'dist')
+);
+if (fs.existsSync(FRONTEND_DIST)) {
+  app.use(express.static(FRONTEND_DIST));
+  // SPA catch-all: serve index.html for any non-API route so React Router works
+  app.get(/^(?!\/api(?:\/|$))/, (req, res) => {
+    res.sendFile(path.join(FRONTEND_DIST, 'index.html'));
+  });
+} else {
+  // 404 handler (no frontend build present)
+  app.use((req, res) => {
+    res.status(404).json({ success: false, message: `Route ${req.method} ${req.path} not found` });
+  });
+}
 
 // Global error handler
 app.use((err, req, res, next) => {
