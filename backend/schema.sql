@@ -1,8 +1,8 @@
 -- Lottery Application Database Schema
 -- Run this file to set up the database
 
-CREATE DATABASE IF NOT EXISTS lottery_db;
-USE lottery_db;
+CREATE DATABASE IF NOT EXISTS u864793484_reel;
+USE u864793484_reel;
 
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
