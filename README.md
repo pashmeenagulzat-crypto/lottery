@@ -92,6 +92,44 @@ npm run build
 
 Frontend runs on **http://localhost:5173** (proxies `/api` to backend)
 
+### 4. Frontend Production Env
+
+Create `frontend/.env.production` (already added in this repo) and set:
+
+```env
+VITE_API_BASE_URL=/api
+```
+
+If your backend is on another domain, use full URL instead:
+
+```env
+VITE_API_BASE_URL=https://api.yourdomain.com/api
+```
+
+### 5. Deploy Frontend Build
+
+```bash
+cd frontend
+npm install
+npm run build
+```
+
+Upload the generated `frontend/dist` contents to your hosting public folder.
+If you host under a subfolder, this project already uses relative Vite assets (`base: './'`) for compatibility.
+
+For Apache/cPanel hosting, this repo includes SPA rewrite rules in `frontend/public/.htaccess`.
+After build, make sure `.htaccess` is present in the deployed root with `index.html`.
+
+Quick deploy flow:
+
+```bash
+cd frontend
+npm install
+npm run build
+```
+
+Then upload everything inside `frontend/dist` to your domain document root (for example, `public_html`).
+
 ---
 
 ## 🔧 Environment Variables
