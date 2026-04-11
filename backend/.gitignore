@@ -1,3 +1,7 @@
 node_modules/
 .env
 *.log
+
+# Ignore uploaded files but keep the directory skeleton
+uploads/*
+!uploads/.gitkeep

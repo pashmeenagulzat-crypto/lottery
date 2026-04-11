@@ -20,6 +20,12 @@ const adminRoutes = require('./routes/admin');
 const app = express();
 const server = http.createServer(app);
 
+// Ensure the uploads directory exists (multer stores files here)
+const UPLOADS_DIR = path.join(__dirname, 'uploads');
+if (!fs.existsSync(UPLOADS_DIR)) {
+  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+}
+
 // Allowed development origins for local development only
 const DEV_ORIGINS = [
   'http://localhost:5173',
@@ -72,6 +78,9 @@ app.use(cors({ origin: allowedOrigins }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use('/api/', apiLimiter);
+
+// Serve uploaded files (e.g. deposit screenshots) as static assets
+app.use('/uploads', express.static(UPLOADS_DIR));
 
 // Health check
 app.get('/health', (req, res) => {
